@@ -1,0 +1,889 @@
+{
+	"info": {
+		"_postman_id": "banking-transactions-api",
+		"name": "Banking Transactions API",
+		"description": "Complete collection for testing the Banking Transactions API. This collection includes all endpoints for submitting transactions, checking account balances, and generating summary reports.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "banking-api"
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8000/api",
+			"type": "string"
+		},
+		{
+			"key": "aliceSecretKey",
+			"value": "change_this_key",
+			"type": "string",
+			"description": "Alice - owns account 1"
+		},
+		{
+			"key": "bobSecretKey",
+			"value": "change_this_key",
+			"type": "string",
+			"description": "Bob - owns account 2"
+		},
+		{
+			"key": "charlieSecretKey",
+			"value": "change_this_key",
+			"type": "string",
+			"description": "Charlie - owns account 3"
+		}
+	],
+	"item": [
+		{
+			"name": "Transactions",
+			"item": [
+				{
+					"name": "Submit Deposit Transaction",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Secret-Key",
+								"value": "{{aliceSecretKey}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"type\": \"deposit\",\n  \"amount\": 1000.00,\n  \"destination_account_id\": 1\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/transactions",
+							"host": ["{{baseUrl}}"],
+							"path": ["transactions"]
+						},
+						"description": "Submit a deposit transaction to add funds to an account. Only requires destination_account_id."
+					},
+					"response": []
+				},
+				{
+					"name": "Submit Withdrawal Transaction",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Secret-Key",
+								"value": "{{aliceSecretKey}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"type\": \"withdrawal\",\n  \"amount\": 500.00,\n  \"source_account_id\": 1\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/transactions",
+							"host": ["{{baseUrl}}"],
+							"path": ["transactions"]
+						},
+						"description": "Submit a withdrawal transaction to remove funds from an account. Only requires source_account_id. Will fail if insufficient funds."
+					},
+					"response": []
+				},
+				{
+					"name": "Submit Transfer Transaction",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Secret-Key",
+								"value": "{{aliceSecretKey}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"type\": \"transfer\",\n  \"amount\": 250.00,\n  \"source_account_id\": 1,\n  \"destination_account_id\": 2\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/transactions",
+							"host": ["{{baseUrl}}"],
+							"path": ["transactions"]
+						},
+						"description": "Submit a transfer transaction to move funds from one account to another. Requires both source_account_id and destination_account_id. Will fail if insufficient funds in source account."
+					},
+					"response": []
+				},
+				{
+					"name": "Submit Transaction - Negative Amount (Should Fail)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Secret-Key",
+								"value": "{{aliceSecretKey}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"type\": \"deposit\",\n  \"amount\": -100.00,\n  \"destination_account_id\": 1\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/transactions",
+							"host": ["{{baseUrl}}"],
+							"path": ["transactions"]
+						},
+						"description": "Test validation - negative amounts should be rejected with a 400 error."
+					},
+					"response": []
+				},
+				{
+					"name": "Submit Transaction - Insufficient Funds (Should Fail)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Secret-Key",
+								"value": "{{aliceSecretKey}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"type\": \"withdrawal\",\n  \"amount\": 999999.00,\n  \"source_account_id\": 1\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/transactions",
+							"host": ["{{baseUrl}}"],
+							"path": ["transactions"]
+						},
+						"description": "Test insufficient funds validation - should be rejected and logged as a failed transaction."
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints for submitting various types of transactions (deposit, withdrawal, transfer)"
+		},
+		{
+			"name": "Accounts",
+			"item": [
+				{
+					"name": "Get Account Balance - Account 1",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Secret-Key",
+								"value": "{{aliceSecretKey}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/accounts/1/balance",
+							"host": ["{{baseUrl}}"],
+							"path": ["accounts", "1", "balance"]
+						},
+						"description": "Get the current balance for account ID 1"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Account Balance - Account 2",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Secret-Key",
+								"value": "{{bobSecretKey}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/accounts/2/balance",
+							"host": ["{{baseUrl}}"],
+							"path": ["accounts", "2", "balance"]
+						},
+						"description": "Get the current balance for account ID 2"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Account Balance - Invalid Account (Should Fail)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Secret-Key",
+								"value": "{{aliceSecretKey}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/accounts/99999/balance",
+							"host": ["{{baseUrl}}"],
+							"path": ["accounts", "99999", "balance"]
+						},
+						"description": "Test getting balance for a non-existent account - should return 404"
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints for retrieving account balance information"
+		},
+		{
+			"name": "Reports",
+			"item": [
+				{
+					"name": "Get Summary Report",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/reports/summary",
+							"host": ["{{baseUrl}}"],
+							"path": ["reports", "summary"]
+						},
+						"description": "Get a comprehensive summary report including:\n- Current balance for each account\n- Largest single transaction per account\n- Number of failed transactions with reasons"
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints for generating summary reports"
+		},
+		{
+			"name": "Complete Test Flow",
+			"item": [
+				{
+					"name": "Setup - Deposit Initial Funds",
+					"item": [
+						{
+							"name": "Alice deposits $1000",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 201\", function () {",
+											"    pm.response.to.have.status(201);",
+											"});",
+											"",
+											"pm.test(\"Transaction successful\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.success).to.eql(true);",
+											"    pm.expect(jsonData.data.status).to.eql('completed');",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "X-Secret-Key",
+										"value": "{{aliceSecretKey}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"type\": \"deposit\",\n  \"amount\": 1000.00,\n  \"destination_account_id\": 1\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/transactions",
+									"host": ["{{baseUrl}}"],
+									"path": ["transactions"]
+								},
+								"description": "Alice deposits $1000 to her account (Account 1)"
+							},
+							"response": []
+						},
+						{
+							"name": "Bob deposits $500",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 201\", function () {",
+											"    pm.response.to.have.status(201);",
+											"});",
+											"",
+											"pm.test(\"Transaction successful\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.success).to.eql(true);",
+											"    pm.expect(jsonData.data.status).to.eql('completed');",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "X-Secret-Key",
+										"value": "{{bobSecretKey}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"type\": \"deposit\",\n  \"amount\": 500.00,\n  \"destination_account_id\": 2\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/transactions",
+									"host": ["{{baseUrl}}"],
+									"path": ["transactions"]
+								},
+								"description": "Bob deposits $500 to his account (Account 2)"
+							},
+							"response": []
+						}
+					],
+					"description": "Initial deposits to setup test accounts"
+				},
+				{
+					"name": "Balance Checks",
+					"item": [
+						{
+							"name": "Alice checks her balance",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Balance is positive\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.data.balance).to.be.greaterThan(0);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "X-Secret-Key",
+										"value": "{{aliceSecretKey}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/accounts/1/balance",
+									"host": ["{{baseUrl}}"],
+									"path": ["accounts", "1", "balance"]
+								},
+								"description": "Alice checks her own account balance"
+							},
+							"response": []
+						},
+						{
+							"name": "Bob checks his balance",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Balance is positive\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.data.balance).to.be.greaterThan(0);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "X-Secret-Key",
+										"value": "{{bobSecretKey}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/accounts/2/balance",
+									"host": ["{{baseUrl}}"],
+									"path": ["accounts", "2", "balance"]
+								},
+								"description": "Bob checks his own account balance"
+							},
+							"response": []
+						}
+					],
+					"description": "Users checking their own account balances"
+				},
+				{
+					"name": "Withdrawals",
+					"item": [
+						{
+							"name": "Alice withdraws $200",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 201\", function () {",
+											"    pm.response.to.have.status(201);",
+											"});",
+											"",
+											"pm.test(\"Transaction successful\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.success).to.eql(true);",
+											"    pm.expect(jsonData.data.status).to.eql('completed');",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "X-Secret-Key",
+										"value": "{{aliceSecretKey}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"type\": \"withdrawal\",\n  \"amount\": 200.00,\n  \"source_account_id\": 1\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/transactions",
+									"host": ["{{baseUrl}}"],
+									"path": ["transactions"]
+								},
+								"description": "Alice withdraws $200 from her account"
+							},
+							"response": []
+						}
+					],
+					"description": "Withdrawal transactions"
+				},
+				{
+					"name": "Transfers Between Users",
+					"item": [
+						{
+							"name": "Alice transfers $100 to Bob",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 201\", function () {",
+											"    pm.response.to.have.status(201);",
+											"});",
+											"",
+											"pm.test(\"Transaction successful\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.success).to.eql(true);",
+											"    pm.expect(jsonData.data.status).to.eql('completed');",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "X-Secret-Key",
+										"value": "{{aliceSecretKey}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"type\": \"transfer\",\n  \"amount\": 100.00,\n  \"source_account_id\": 1,\n  \"destination_account_id\": 2\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/transactions",
+									"host": ["{{baseUrl}}"],
+									"path": ["transactions"]
+								},
+								"description": "Alice transfers $100 from her account to Bob's account"
+							},
+							"response": []
+						},
+						{
+							"name": "Bob transfers $50 to Charlie",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 201\", function () {",
+											"    pm.response.to.have.status(201);",
+											"});",
+											"",
+											"pm.test(\"Transaction successful\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.success).to.eql(true);",
+											"    pm.expect(jsonData.data.status).to.eql('completed');",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "X-Secret-Key",
+										"value": "{{bobSecretKey}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"type\": \"transfer\",\n  \"amount\": 50.00,\n  \"source_account_id\": 2,\n  \"destination_account_id\": 3\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/transactions",
+									"host": ["{{baseUrl}}"],
+									"path": ["transactions"]
+								},
+								"description": "Bob transfers $50 from his account to Charlie's account"
+							},
+							"response": []
+						}
+					],
+					"description": "Valid transfers between different users (user owns source account)"
+				},
+				{
+					"name": "Authorization Tests (SHOULD FAIL with 403)",
+					"item": [
+						{
+							"name": "Alice tries to check Bob's balance (FORBIDDEN)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 403 Forbidden\", function () {",
+											"    pm.response.to.have.status(403);",
+											"});",
+											"",
+											"pm.test(\"Error indicates unauthorized\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.error).to.exist;",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "X-Secret-Key",
+										"value": "{{aliceSecretKey}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/accounts/2/balance",
+									"host": ["{{baseUrl}}"],
+									"path": ["accounts", "2", "balance"]
+								},
+								"description": "Alice attempting to check Bob's account - should return 403"
+							},
+							"response": []
+						},
+						{
+							"name": "Bob tries to withdraw from Alice's account (FORBIDDEN)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 403 Forbidden\", function () {",
+											"    pm.response.to.have.status(403);",
+											"});",
+											"",
+											"pm.test(\"Error indicates unauthorized\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.error).to.exist;",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "X-Secret-Key",
+										"value": "{{bobSecretKey}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"type\": \"withdrawal\",\n  \"amount\": 100.00,\n  \"source_account_id\": 1\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/transactions",
+									"host": ["{{baseUrl}}"],
+									"path": ["transactions"]
+								},
+								"description": "Bob attempting to withdraw from Alice's account - should return 403"
+							},
+							"response": []
+						},
+						{
+							"name": "Charlie tries to deposit to Bob's account (FORBIDDEN)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 403 Forbidden\", function () {",
+											"    pm.response.to.have.status(403);",
+											"});",
+											"",
+											"pm.test(\"Error indicates unauthorized\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.error).to.exist;",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "X-Secret-Key",
+										"value": "{{charlieSecretKey}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"type\": \"deposit\",\n  \"amount\": 100.00,\n  \"destination_account_id\": 2\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/transactions",
+									"host": ["{{baseUrl}}"],
+									"path": ["transactions"]
+								},
+								"description": "Charlie attempting to deposit to Bob's account - should return 403"
+							},
+							"response": []
+						}
+					],
+					"description": "Tests verifying users cannot access accounts they don't own - all should return 403"
+				},
+				{
+					"name": "Validation Tests",
+					"item": [
+						{
+							"name": "Insufficient Funds - Alice tries to withdraw $10,000",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 201\", function () {",
+											"    pm.response.to.have.status(201);",
+											"});",
+											"",
+											"pm.test(\"Transaction recorded as failed\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.data.status).to.eql('failed');",
+											"    pm.expect(jsonData.data.failure_reason).to.eql('Insufficient funds');",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "X-Secret-Key",
+										"value": "{{aliceSecretKey}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"type\": \"withdrawal\",\n  \"amount\": 10000.00,\n  \"source_account_id\": 1\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/transactions",
+									"host": ["{{baseUrl}}"],
+									"path": ["transactions"]
+								},
+								"description": "Alice tries to withdraw more than her balance - recorded as failed transaction"
+							},
+							"response": []
+						},
+						{
+							"name": "Negative Amount - Bob tries to deposit -$50",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 201\", function () {",
+											"    pm.response.to.have.status(201);",
+											"});",
+											"",
+											"pm.test(\"Transaction recorded as failed\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.data.status).to.eql('failed');",
+											"    pm.expect(jsonData.data.failure_reason).to.include('Negative');",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "X-Secret-Key",
+										"value": "{{bobSecretKey}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"type\": \"deposit\",\n  \"amount\": -50.00,\n  \"destination_account_id\": 2\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/transactions",
+									"host": ["{{baseUrl}}"],
+									"path": ["transactions"]
+								},
+								"description": "Bob tries to deposit negative amount - recorded as failed transaction"
+							},
+							"response": []
+						}
+					],
+					"description": "Validation tests - these create failed transaction records (not errors)"
+				},
+				{
+					"name": "Summary Report",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Report contains account data\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.data.accounts).to.be.an('array');",
+									"    pm.expect(jsonData.data.accounts.length).to.be.greaterThan(0);",
+									"});",
+									"",
+									"pm.test(\"Report contains failed transactions\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.data.failed_transactions).to.be.an('array');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Secret-Key",
+								"value": "{{aliceSecretKey}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/reports/summary",
+							"host": ["{{baseUrl}}"],
+							"path": ["reports", "summary"]
+						},
+						"description": "Get comprehensive summary report of all accounts and failed transactions"
+					},
+					"response": []
+				}
+			],
+			"description": "**Complete test flow demonstrating all functionality**\n\n**Simple Model:** 1 User = 1 Account\n- Alice owns Account 1\n- Bob owns Account 2\n- Charlie owns Account 3\n\n**Test Scenarios:**\n1. **Setup:** Users deposit initial funds to their own accounts\n2. **Balance Checks:** Users check their own account balances\n3. **Withdrawals:** Alice withdraws from her account\n4. **Transfers:** Alice→Bob, Bob→Charlie (valid cross-user transfers)\n5. **Authorization:** Tests that users CANNOT access other users' accounts (403)\n6. **Validation:** Insufficient funds and negative amounts create failed transaction records\n7. **Summary Report:** Shows all accounts, largest transactions, and failed transactions\n\nRun this folder in Postman Collection Runner to see the complete flow!"
+		}
+	]
+}

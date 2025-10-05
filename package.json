@@ -1,0 +1,34 @@
+{
+  "name": "banking-assignment",
+  "version": "1.0.0",
+  "description": "Banking Transaction API with MySQL integration",
+  "main": "dist/server.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "dev": "nodemon --exec ts-node src/server.ts",
+    "clean": "rm -rf dist",
+    "prebuild": "npm run clean",
+    "migrate": "ts-node scripts/migrate.ts",
+    "seed": "ts-node scripts/seed.ts",
+    "setup": "npm run migrate && npm run seed"
+  },
+  "keywords": ["banking", "api", "mysql", "typescript", "express"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/express": "^5.0.3",
+    "@types/joi": "^17.2.3",
+    "@types/node": "^24.6.2",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "joi": "^18.0.1",
+    "mysql2": "^3.15.1",
+    "nodemon": "^3.1.10",
+    "pino": "^10.0.0",
+    "pino-pretty": "^13.1.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3",
+    "uuid": "^13.0.0"
+  }
+}
